@@ -1,0 +1,17 @@
+{
+  "name": "graphql-restapi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Yena-Yun/GraphQL-RestAPI.git",
+  "author": "Yena-Yun <cheryleduart@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "client": "yarn workspace client start",
+    "server": "yarn workspace server start"
+  }
+}
