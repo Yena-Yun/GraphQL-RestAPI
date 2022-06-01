@@ -42,7 +42,7 @@ const MsgList = () => {
       // targetIndex가 없을 수도 있음('-1') => 아무 것도 안 하고 msgs 배열 그대로 반환
       if (targetIndex < 0) return msgs;
 
-      // msgs 배열에 새 메시지 추가하기 (수정)
+      // otherwise msgs 배열에 새 메시지 추가하기 (수정)
       const newMsgs = [...msgs]; // 기존 배열 복사 (사본 만들기)
       // 사본을 조작
       newMsgs.splice(targetIndex, 1, {
@@ -52,11 +52,24 @@ const MsgList = () => {
       return newMsgs;
     });
 
-    // update가 끝나면 MsgInput 렌더링을 멈춤 (editingId를 null로 만듦)
+    // update가 끝나면 MsgInput 렌더링을 멈춤 (editingId를 null로 변경)
     setEditingId(null);
   };
 
-  const onDelete = (id) => setMsgs([...msgs.filter((msg) => msg.id !== id)]);
+  const onDelete = (id) =>
+    setMsgs((msgs) => {
+      const targetIndex = msgs.findIndex((msg) => msg.id === id);
+
+      if (targetIndex < 0) return msgs;
+
+      // msgs 배열에서 특정 메시지 삭제하기
+      const newMsgs = [...msgs]; // 기존 배열 복사 (사본 만들기)
+      // 사본을 조작
+      newMsgs.splice(targetIndex, 1);
+      return newMsgs;
+    });
+
+  // const onDelete = (id) => setMsgs([...msgs.filter((msg) => msg.id !== id)]);
 
   return (
     <>
