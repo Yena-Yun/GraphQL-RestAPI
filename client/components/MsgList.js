@@ -18,6 +18,9 @@ const originalMsgs = Array(50)
     text: `${50 - i} mock text`,
   }));
 
+// server의 messages.json에 넣을 내용 콘솔에 출력하는 용도
+// console.log(JSON.stringify(originalMsgs));
+
 const MsgList = () => {
   const [msgs, setMsgs] = useState(originalMsgs);
   const [editingId, setEditingId] = useState(null);
