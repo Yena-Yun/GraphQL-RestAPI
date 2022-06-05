@@ -9,9 +9,15 @@ const messagesRoute = [
     // GET MESSAGES
     method: 'get',
     route: '/messages',
-    handler: (req, res) => {
+    handler: ({ query: { cursor = '' } }, res) => {
       const msgs = getMsgs();
-      res.send(msgs); // res.send: 클라이언트(브라우저)에 값 반환(return)
+      // cursor로 들어온 id 바로 다음 것부터 찾게 함
+      // 맨 처음에는 cursor가 ''로 들어오므로 msgs.findIndex((msg) => msg.id === cursor) 부분이 -1이 되고
+      // -1 + 1이 되어 fromIndex 값은 0이 됨 (= 최초에는 0부터 시작)
+      // 19번째 id가 들어오면 fromIndex는 20부터 시작하게 됨 (= 새로 메시지를 받아오기 시작할 id)
+      const fromIndex = msgs.findIndex((msg) => msg.id === cursor) + 1;
+      // 무한스크롤 시 한번에 불러올 메시지 갯수: 15개
+      res.send(msgs.slice(fromIndex, fromIndex + 15)); // res.send: 클라이언트(브라우저)에 값 반환(return)
     },
   },
   {
