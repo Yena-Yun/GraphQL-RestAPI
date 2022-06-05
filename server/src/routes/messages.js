@@ -9,15 +9,22 @@ const messagesRoute = [
     // GET MESSAGES
     method: 'get',
     route: '/messages',
+    // 무한스크롤 인식
+    // params로 넘어온 cursor를 query로 받음 (용어 통일이 필요할 듯 함..)
     handler: ({ query: { cursor = '' } }, res) => {
       const msgs = getMsgs();
-      // cursor로 들어온 id 바로 다음 것부터 찾게 함
-      // 맨 처음에는 cursor가 ''로 들어오므로 msgs.findIndex((msg) => msg.id === cursor) 부분이 -1이 되고
-      // -1 + 1이 되어 fromIndex 값은 0이 됨 (= 최초에는 0부터 시작)
-      // 19번째 id가 들어오면 fromIndex는 20부터 시작하게 됨 (= 새로 메시지를 받아오기 시작할 id)
+
+      // 무한스크롤
+      // fromIndex: (fetchMoreEl에 스크롤이 닿으면) 새로 메시지를 받아오기 시작할 id
+      // => cursor로 들어온 id(= 맨 마지막 msg의 id) 바로 다음 id부터 찾게 함
+      // 맨 처음에는 cursor가 빈 문자열('')로 들어오므로 'msgs.findIndex((msg) => msg.id === cursor)' 부분이 -1이 되고
+      // 뒤의 1을 더하면 (-1) + 1이 되어 최초의 fromIndex 값은 0이 됨
+      // 이후로는 예를 들어 19번째 id가 cursor로 들어오면 fromIndex는 20부터 시작
       const fromIndex = msgs.findIndex((msg) => msg.id === cursor) + 1;
-      // 무한스크롤 시 한번에 불러올 메시지 갯수: 15개
-      res.send(msgs.slice(fromIndex, fromIndex + 15)); // res.send: 클라이언트(브라우저)에 값 반환(return)
+
+      // 무한스크롤 시 한번에 불러올 메시지 갯수를 15개로 설정 (전체 msgs 배열에서 15개씩 잘라서 불러옴)
+      res.send(msgs.slice(fromIndex, fromIndex + 15));
+      // res.send(msgs); // res.send: 클라이언트(브라우저)에 값 반환(return)
     },
   },
   {

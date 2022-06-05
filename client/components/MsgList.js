@@ -37,9 +37,9 @@ const MsgList = () => {
   const [editingId, setEditingId] = useState(null);
   // const { userId } = query;
 
+  // 무한스크롤
   const fetchMoreEl = useRef(null);
-  // fetchMoreEl가 화면 상에 노출되면 intersecting이 true 아니면 false
-  //  => fetchMoreEl가 화면 상에 노출되는지 여부를 useInfiniteScroll 훅을 통해 판단
+  // fetchMoreEl가 화면상에 노출되면 intersecting 상태를 true로 변경 (useInfiniteScroll의 반환값(boolean)에 의해)
   const intersecting = useInfiniteScroll(fetchMoreEl);
 
   // useEffect 내부가 아니면 async 바로 사용 가능
@@ -116,10 +116,11 @@ const MsgList = () => {
 
   // const onDelete = (id) => setMsgs([...msgs.filter((msg) => msg.id !== id)]);
 
-  // useEffect 내에서는 async/await를 직접 호출하지 않도록 권장 => 함수를 별도로 만들어서 해당 함수를 useEffect 내에서 호출
+  // useEffect 내에서는 async/await를 직접 호출하지 않도록 권장 => 함수를 별도로 만들고 해당 함수를 useEffect 내에서 호출
   const getMessages = async () => {
-    // 무한스크롤 인식을 위해 params로 msgs 배열의 맨 마지막 메시지의 id값을 넘겨줌
-    // (처음에는 없기 때문에 옵셔널 체이닝 + || ''로 예외처리)
+    // 무한스크롤 인식
+    // => params의 cursor 키에 msgs 배열의 맨 마지막 msg의 id값을 넘겨줌 (해당 msg가 있을 때만 || 아니면 cursor에 빈 문자열('') 반환)
+    // (처음에는 마지막 msg가 없기 때문에 ''이 반환됨)
     const newMsgs = await fetcher('get', '/messages', {
       params: { cursor: msgs[msgs.length - 1]?.id || '' },
     });
@@ -131,7 +132,7 @@ const MsgList = () => {
     getMessages();
   }, []);
 
-  // 이후 intersecting이 true일 때마다 getMessages 다시 호출 (무한스크롤)
+  // 이후 intersecting(= useInfiniteScroll의 반환값)이 true이면 getMessages 다시 호출 (=== 무한스크롤)
   useEffect(() => {
     if (intersecting) getMessages();
   }, [intersecting]);
