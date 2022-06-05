@@ -12,3 +12,4 @@
 6. Next.js의 useRouter 훅 사용 (query 객체를 통해 userId를 받아옴) 
 7. props에 초기값 설정하는 법 <br/> => 자바스크립트 신문법 / 예: { text = '', id = undefined }
 8. 날짜 format 설정하기 <br/> => new Date로 date 객체로 변환 후 toLocaleString()의 옵션 활용
+9. 무한스크롤 구현 <br/> => 처음에 모든 messages 데이터를 다 가져오지 않고 일부만 가져온 뒤 스크롤 위치에 따라 추가 fetch 하도록
