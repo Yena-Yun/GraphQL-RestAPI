@@ -1,4 +1,4 @@
-import { readDB } from '../dbController.js'; // 뒤에 .js 붙여줘야
+import { readDB, writeDB } from '../dbController.js'; // 뒤에 .js 붙여줘야
 import { v4 } from 'uuid';
 
 const getMsgs = () => readDB('messages');
@@ -11,7 +11,7 @@ const messagesRoute = [
     route: '/messages',
     handler: (req, res) => {
       const msgs = getMsgs();
-      res.send(msgs); // res.send: 클라이언트(브라우저)에 값 반환
+      res.send(msgs); // res.send: 클라이언트(브라우저)에 값 반환(return)
     },
   },
   {
@@ -44,19 +44,27 @@ const messagesRoute = [
     route: '/messages',
     // req 안에 body, params, query가 있음 - 그 중에 여기서는 body만 사용
     handler: ({ body }, res) => {
-      const msgs = getMsgs();
+      try {
+        // userId가 없을 때는 에러만 던지고 다음 코드를 실행하지 않음
+        // => URL의 쿼리에 userId를 지정하지 않고 그냥 localhost:3000/ 경로에서 메시지를 추가하면 500번 에러가 뜨면서 메시지가 등록되지 않음 (= 로그인 여부 확인 기능과 유사하도록 구현된 부분)
+        if (!body.userId) throw Error('no userId');
 
-      const newMsg = {
-        id: v4(), // (= 'v4 버전의 unique한 id 생성')
-        userId: body.userId,
-        timestamp: Date.now(),
-        text: body.text,
-      };
+        const msgs = getMsgs();
 
-      msgs.unshift(newMsg); // 원본 배열 맨 앞에 추가 (직접 수정)
-      setMsgs(msgs); // 추가된 msgs로 DB 수정 (setMsgs === writeDB)
+        const newMsg = {
+          id: v4(), // (= 'v4 버전의 unique한 id 생성')
+          userId: body.userId,
+          timestamp: Date.now(),
+          text: body.text,
+        };
 
-      res.send(newMsg); // 클라에 새로 만든 메시지 반환 (=> 요청 성공 시 새로 만든 메시지 반환)
+        msgs.unshift(newMsg); // 원본 배열 맨 앞에 추가 (직접 수정)
+        setMsgs(msgs); // 추가된 msgs로 DB 수정 (setMsgs === writeDB)
+
+        res.send(newMsg); // 클라에 새로 만든 메시지 반환 (=> 요청 성공 시 새로 만든 메시지 반환)
+      } catch (err) {
+        res.status(500).send({ error: err });
+      }
     },
   },
   {
@@ -99,7 +107,7 @@ const messagesRoute = [
     // DELETE MESSAGE
     method: 'delete',
     route: '/messages/:id',
-    handler: ({ body, params: { id } }, res) => {
+    handler: ({ params: { id }, query: { userId } }, res) => {
       // id를 직접 사용할 때는 클라이언트와 서버 간에 id 싱크가 안 맞을 경우 에러 발생 가능 => try/catch 처리
       try {
         const msgs = getMsgs();
@@ -107,13 +115,12 @@ const messagesRoute = [
         const targetIndex = msgs.findIndex((msg) => msg.id === id); // 삭제할 메시지를 index로 가져옴
         // 삭제할 메시지가 없거나 사용자가 다른 경우 예외처리
         if (targetIndex < 0) throw '메시지가 없습니다.';
-        if (msgs[targetIndex].userId !== body.userId)
-          throw '사용자가 다릅니다.';
+        if (msgs[targetIndex].userId !== userId) throw '사용자가 다릅니다.';
 
         msgs.splice(targetIndex, 1);
         setMsgs(msgs); // 특정 메시지가 삭제된 msgs 배열로 DB 수정
 
-        res.send(id); // 삭제 성공 시 클라이언트에 삭제한 id만 넘겨줌
+        res.send(id); // 삭제 성공 시 클라이언트에 삭제한 id만 반환(= return 값)
       } catch (err) {
         // 에러가 있을 경우 status를 500으로 지정해주고 send로 에러메시지 띄움
         res.status(500).send({ error: err });
