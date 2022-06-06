@@ -24,7 +24,7 @@ import useInfiniteScroll from '../hooks/useInfiniteScroll';
 // server의 messages.json에 넣을 내용 콘솔에 출력하는 용도
 // console.log(JSON.stringify(originalMsgs));
 
-const MsgList = () => {
+const MsgList = ({ smsgs }) => {
   // const {
   //   query: { userId = '' },
   // } = useRouter();
@@ -33,7 +33,7 @@ const MsgList = () => {
   const userId = query.userId || query.userid || '';
 
   // const [msgs, setMsgs] = useState(originalMsgs);
-  const [msgs, setMsgs] = useState([]);
+  const [msgs, setMsgs] = useState(smsgs);
   const [editingId, setEditingId] = useState(null);
   // const { userId } = query;
 
@@ -124,7 +124,7 @@ const MsgList = () => {
     const newMsgs = await fetcher('get', '/messages', {
       params: { cursor: msgs[msgs.length - 1]?.id || '' },
     });
-    setMsgs(newMsgs);
+    setMsgs([...msgs, ...newMsgs]);
   };
 
   // 최초에 한 번 getMessages 실행
@@ -139,7 +139,6 @@ const MsgList = () => {
 
   return (
     <>
-      <h1>SIMPLE SNS</h1>
       {/* (URL에 지정된) userId가 없으면 아예 맨 위의 input창이 뜨지 않도록 함 */}
       {userId && <MsgInput mutate={onCreate} />}
       <ul className='messages'>
