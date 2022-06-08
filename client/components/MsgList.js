@@ -24,7 +24,7 @@ import useInfiniteScroll from '../hooks/useInfiniteScroll';
 // server의 messages.json에 넣을 내용 콘솔에 출력하는 용도
 // console.log(JSON.stringify(originalMsgs));
 
-const MsgList = ({ smsgs }) => {
+const MsgList = ({ smsgs, users }) => {
   // const {
   //   query: { userId = '' },
   // } = useRouter();
@@ -151,6 +151,7 @@ const MsgList = ({ smsgs }) => {
             startEdit={() => setEditingId(x.id)}
             isEditing={editingId === x.id}
             myId={userId}
+            user={users[x.userId]}
           />
         ))}
       </ul>

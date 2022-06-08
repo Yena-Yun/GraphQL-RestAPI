@@ -1,10 +1,10 @@
 import MsgList from '../components/MsgList';
 import fetcher from '../fetcher';
 
-const Home = ({ smsgs }) => (
+const Home = ({ smsgs, users }) => (
   <>
     <h1>SIMPLE SNS</h1>
-    <MsgList smsgs={smsgs} />
+    <MsgList smsgs={smsgs} users={users} />
   </>
 );
 
@@ -12,10 +12,11 @@ const Home = ({ smsgs }) => (
 export const getServerSideProps = async () => {
   // smsgs = server msgs
   const smsgs = await fetcher('get', '/messages');
+  const users = await fetcher('get', '/users');
 
-  // 여기서 props를 반환하면 다른 컴포넌트(Home)에서 smsgs를 props로 받아 사용할 수 있게 된다.
+  // 여기서 반환된 props는 다른 모든 컴포넌트(예: Home, MsgList)에서 사용 가능
   return {
-    props: { smsgs },
+    props: { smsgs, users },
   };
 };
 
