@@ -1,11 +1,12 @@
 // express 앱을 띄우기 위한 모든 내용이 포함된 곳
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import cors from 'cors';
-import messagesRoute from './routes/messages.js'; // 뒤에 .js 안 붙이면 에러 발생
-import usersRoute from './routes/users.js'; // (마찬가지)
-
-const app = express(); // express를 실행해서 app 객체 생성
+// import cors from 'cors'; // 2021년 7월 GraphQL 업데이트로 인해 더 이상 사용 x
+// import messagesRoute from './routes/messages.js'; // 뒤에 .js 안 붙이면 에러 발생
+// import usersRoute from './routes/users.js'; // (마찬가지)
+import resolvers from './resolvers/index.js';
+import schema from './schema/index.js';
+import { readDB } from './dbController.js'; // GraphQL의 경우 readDB를 여기서 가져옴!
 
 // express.urlencoded: 미들웨어, extended 옵션 설정 필수
 // extended가 false이면 Node.js에 기본 내장된 querystring 모듈 사용, true이면 추가로 설치 필요한 qs 모듈 사용
@@ -14,12 +15,13 @@ const app = express(); // express를 실행해서 app 객체 생성
 // app.use(express.json()); // express에서 json 형태로 사용하겠다고 선언
 
 // cors 설정 (클라와 충돌 안 나도록)
-app.use(
-  cors({
-    origin: 'http://localhost:3000', // origin은 클라 주소로 설정
-    credentials: true, // 클라를 믿는다(?)
-  })
-);
+// 2021년 7월 GraphQL 업데이트 이후 - cors는 아래에서 server 호출 시 미들웨어의 옵션으로 처리해주게 됨
+// app.use(
+//   cors({
+//     origin: 'http://localhost:3000', // origin은 클라 주소로 설정
+//     credentials: true, // 클라를 믿는다(?)
+//   })
+// );
 
 // graphQL 정의
 const server = new ApolloServer({
@@ -27,16 +29,25 @@ const server = new ApolloServer({
   typeDefs: schema,
   // resolver = Rest API에서의 라우팅 담당**
   resolvers,
-  // context의 models = DB
+  // context의 models = DB (Rest API에서의 readDB 부분)
   context: {
-    models: {
-      messages: '',
-      users: '',
+    db: {
+      messages: readDB('messages'),
+      users: readDB('users'),
     },
   },
 });
 
-server.applyMiddleware({ app, path: '/graphql' });
+const app = express(); // express를 실행해서 app 객체 생성
+await server.start();
+server.applyMiddleware({
+  app,
+  path: '/graphql',
+  cors: {
+    origin: ['http://localhost:3000', 'https://studio.apollographql.com'], // origin은 클라 주소로 설정
+    credentials: true, // 클라를 믿는다(?)
+  },
+});
 
 // app 사용 기본형태
 // app.get('/', (res, req) => {
@@ -44,12 +55,16 @@ server.applyMiddleware({ app, path: '/graphql' });
 // })
 
 // spread 문법: 배열(messagesRoute), 객체(usersRoute) 둘 다 적용 가능
-const routes = [...messagesRoute, ...usersRoute];
-routes.forEach(({ method, route, handler }) => {
-  app[method](route, handler);
-});
+// const routes = [...messagesRoute, ...usersRoute];
+// routes.forEach(({ method, route, handler }) => {
+//   app[method](route, handler);
+// });
 
 // 서버 포트는 8000으로 지정 (localhost:8000에서 확인)
-app.listen(8000, () => {
-  console.log('Server listening on 8000...');
-});
+// app.listen(8000, () => {
+//   console.log('Server listening on 8000...');
+// });
+
+// 2021년 7월 업데이트 이후 await 사용 가능해짐 - listen이 완료가 되었을 때 비로소 다음 줄을 실행
+await app.listen({ port: 8000 });
+console.log('Server listening on 8000...');

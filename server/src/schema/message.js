@@ -17,8 +17,8 @@ const messageSchema = gql`
   }
 
   extend type Query {
-    messages(cursor: ID): [Message!]! # getMessages
-    messages(id: ID!): Message! # getMessage
+    messages: [Message!]! # getMessages
+    message(id: ID!): Message! # getMessage
   }
 
   extend type Mutation {
