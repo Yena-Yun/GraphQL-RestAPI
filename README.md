@@ -25,7 +25,15 @@
 ## 4. Server - GraphQL 구현
 ### Rest API와 비교한 GraphQL의 특징
 * Rest API는 CRUD마다 각각 API URL이 달라짐 (Route 개념)
-* GraphQL은 (예를 들면) '/graphql'이라는 API 하나로 그 내부에서 자체적으로 CRUD 관련한 로직 처리 
-  => resolver가 Rest API에서의 라우터 역할 담당
+* GraphQL은 (예를 들면) '/graphql'이라는 API 하나로 CRUD API를 모두 처리 
+  => resolvers가 Rest API에서의 routers 역할 담당
+  
+#### schema 정의
 12. apollo-server-express 라이브러리의 gql 모듈을 통해 schema(graphQL 통신 시의 응답값) 설정
 13. schema 폴더 내의 index.js에서 만든 스키마들과 index.js 내에서 정의한 linkSchema(default 스키마)를 모아 export
+#### resolvers 정의
+Rest API에서 사용한 routers 내용과 유사
+단, routers에서는 message와 user 각각 get/post/update/delete에 해당하는 axios의 옵션(method, route, handler)들을 
+각 route마다 일일이 지정했지만 graphQL에서는 route는 /graphql 하나뿐이고 resolvers의 message 안에서
+gql 모듈을 사용해 type 지정 후 get 내용은 Query, 그 외 post/update/delete 내용은 Mutation에 정의
+=> 선언적으로 한 눈에 인수와 반환값을 알 수 있는 문법!
