@@ -16,7 +16,7 @@ export const GET_MESSAGES = gql`
 `;
 
 export const GET_MESSAGE = gql`
-  query GET_MESSAGES($id: ID!) {
+  query GET_MESSAGE($id: ID!) {
     message(id: $id) {
       id
       text

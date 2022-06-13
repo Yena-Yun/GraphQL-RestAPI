@@ -15,7 +15,7 @@ const MsgItem = ({
   return (
     <li className='messages__item'>
       <h3>
-        {user.nickname}
+        {user?.nickname}
         <sub>
           {new Date(timestamp).toLocaleString('ko-KR', {
             year: 'numeric',

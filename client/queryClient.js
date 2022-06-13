@@ -22,6 +22,14 @@ const URL = 'http://localhost:8000/graphql';
 export const fetcher = (query, variables = {}) =>
   request(URL, query, variables);
 
+// useQuery 사용 시 특정 기점을 기준으로 불러오는 QueryKeys 필요 (여기에 상수로 정의해놓음)
+export const QueryKeys = {
+  MESSAGES: 'MESSAGES',
+  MESSAGE: 'MESSAGE',
+  USERS: 'USERS',
+  USER: 'USER',
+};
+
 /**
  * get: axios.get(url[, config])
  * delete: axios.delete(url[, config])
