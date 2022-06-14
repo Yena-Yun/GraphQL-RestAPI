@@ -52,7 +52,7 @@ gql 모듈을 사용해 type 지정 후 get 내용은 Query, 그 외 post/update
 [ 기존의 fetcher.js 변경사항 ]
 * 파일명을 queryclient.js로 변경
 * axios 대신 graphql-request의 request 모듈 사용
-* 기존의 axios.defaults.baseURL 대신 대문자 URL 상수 선언 + 'http://localhost:8000' 뒤에 **/graphql** 경로 추가 
-  => Rest API는 기본 url 뒤에 각각 CRUD에 맞는 서버를 호출할 경로를 매번 붙여주지만(/message, /user, /message/:id, ..) <br/>
-    GraphQL은 '/graphql' 경로 하나로 모든 CRUD 호출을 처리
+* 기존의 axios.defaults.baseURL 대신 대문자 URL 상수 선언 + 'http://localhost:8000' 뒤에 **/graphql** 경로 추가 <br/>
+    => Rest API는 기본 url 뒤에 각각 CRUD에 맞는 서버를 호출할 경로를 매번 붙여주지만(/message, /user, /message/:id, ..), <br/>
+       GraphQL은 '/graphql' 경로 하나로 모든 CRUD 호출을 처리
 * axios 대신 request 모듈을 사용한 실행문으로 fetcher 함수 변경
