@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useInfiniteQuery,
+} from 'react-query';
 import MsgInput from './MsgInput';
 import MsgItem from './MsgItem';
 // import fetcher from '../fetcher';
@@ -11,7 +16,7 @@ import {
   UPDATE_MESSAGE,
   DELETE_MESSAGE,
 } from '../graphql/message';
-// import useInfiniteScroll from '../hooks/useInfiniteScroll';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 
 // const UserIds = ['roy', 'jay'];
 // const getRandomUserId = () => UserIds[Math.round(Math.random())];
@@ -50,9 +55,9 @@ const MsgList = ({ smsgs, users }) => {
   // const { userId } = query;
 
   // 무한스크롤
-  // const fetchMoreEl = useRef(null);
-  // // fetchMoreEl가 화면상에 노출되면 intersecting 상태를 true로 변경 (useInfiniteScroll의 반환값(boolean)에 의해)
-  // const intersecting = useInfiniteScroll(fetchMoreEl);
+  const fetchMoreEl = useRef(null);
+  // fetchMoreEl가 화면상에 노출되면 intersecting 상태를 true로 변경 (useInfiniteScroll의 반환값(boolean)에 의해)
+  const intersecting = useInfiniteScroll(fetchMoreEl);
 
   const { mutate: onCreate } = useMutation(
     ({ text }) => fetcher(CREATE_MESSAGE, { text, userId }),
@@ -208,8 +213,19 @@ const MsgList = ({ smsgs, users }) => {
   // useQuery에 커서 올리면 'UseQueryResult'라는 값을 반환함을 알 수 있음
   // GET_MESSAGES를 fetcher로 호출할 때 함수(() => )로 호출해야 하는 이유: 함수로 호출 안 하면 fetcher 함수가 필요할 때 그때그때 호출되지 않고 바로 호출되어 버리기 때문
   // => 완성된 함수(() => fetcher(GET_MESSAGES))가 와야지, 함수의 결과(fetcher(GET_MESSAGES))가 오면 안 됨
-  const { data, error, isError } = useQuery(QueryKeys.MESSAGES, () =>
-    fetcher(GET_MESSAGES)
+  // const { data, error, isError } = useQuery(QueryKeys.MESSAGES, () =>
+  //   fetcher(GET_MESSAGES)
+  // );
+
+  // 무한스크롤을 위해 위의 useQuery 대신 useInfiniteQuery 사용
+  const { data, error, isError, fetchNextPage, hasNextPage } = useInfiniteQuery(
+    QueryKeys.MESSAGES,
+    ({ pageParam = '' }) => fetcher(GET_MESSAGES, { cursor: pageParam }),
+    {
+      getNextPageParam: ({ messages }) => {
+        return messages?.[messages.length - 1]?.id;
+      },
+    }
   );
 
   // 요청 전에는 클라이언트에 원래 있던 서버의 데이터(state, '옛 것')를 먼저 쓰고,
@@ -219,14 +235,25 @@ const MsgList = ({ smsgs, users }) => {
   useEffect(() => {
     // useEffect의 특성상 맨 처음에는 무조건 1번 호출되고, 이후에는 data.messages가 변경될 때마다 호출 => 처음에 호출되는 것 때문에 아래가 2번 호출됨
     // => 2번 호출되는 상황 방지 (data?.messages가 없으면 아래 내용을 실행하지 않게 함)
-    if (!data?.messages) return;
+    // if (!data?.messages) return;
+
+    // react-query 이후 윗줄 변경
+    if (!data?.pages) return;
 
     console.log('msgs changed'); // 페이지에 들어가자마자 2번 호출됨을 알 수 있다.
 
     // setMsgs(data?.messages || []);
-    // 여기부터는 data.messages가 무조건 있는 상황이므로 다음처럼 작성해도 된다.
-    setMsgs(data.messages);
-  }, [data?.messages]); // data.messages를 확인하여 변경사항이 있을 때만 내부문 실행
+    // 위에서 if문으로 한번 걸러주면 여기부터는 data.messages가 무조건 있는 상황이므로 다음처럼 작성해도 된다.
+    // setMsgs(data.messages);
+
+    // react-query 이후 윗줄 변경
+    // data.pages는 키가 messages인 여러 배열을 하나로 합친 것
+    // const data.pages = [ { messages: [...] }, { messages: [...] } ] => [...]
+    // flatMap: depth 1단계에 대한 내용들을 하나로 합쳐줌
+    const mergedMsgs = data.pages.flatMap((d) => d.messages);
+    console.log({ mergedMsgs });
+    setMsgs(mergedMsgs);
+  }, [data?.pages]); // data.messages를 확인하여 변경사항이 있을 때만 내부문 실행
 
   if (isError) {
     console.error(error);
@@ -249,10 +276,11 @@ const MsgList = ({ smsgs, users }) => {
   //   getMessages();
   // }, []);
 
-  // // 이후 intersecting(= useInfiniteScroll의 반환값)이 true이면 getMessages 다시 호출 (=== 무한스크롤)
-  // useEffect(() => {
-  //   if (intersecting) getMessages();
-  // }, [intersecting]);
+  // 이후 intersecting(= useInfiniteScroll의 반환값)이 true이면 getMessages 다시 호출 (=== 무한스크롤)
+  useEffect(() => {
+    // if (intersecting) getMessages(); // Rest API에서 사용
+    if (intersecting && hasNextPage) fetchNextPage(); // GraphQL + react-query의 useInfiniteQuery 사용
+  }, [intersecting, hasNextPage]);
 
   return (
     <>
@@ -272,6 +300,7 @@ const MsgList = ({ smsgs, users }) => {
           />
         ))}
       </ul>
+      <div ref={fetchMoreEl} />
     </>
   );
 };

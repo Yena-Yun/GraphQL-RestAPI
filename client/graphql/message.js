@@ -5,8 +5,8 @@ import { gql } from 'graphql-tag';
 // 서버에 요청하는 형태 (= request 형식)
 // 만약 timestamp를 삭제하면 서버에 요청할 때 'timestamp는 빼고 보내달라'는 의미가 됨
 export const GET_MESSAGES = gql`
-  query GET_MESSAGES {
-    messages {
+  query GET_MESSAGES($cursor: ID) {
+    messages(cursor: $cursor) {
       id
       text
       userId

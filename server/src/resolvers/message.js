@@ -19,9 +19,13 @@ const messageResolver = {
   Query: {
     // 3번째 인수인 context 안에 db가 들어 있음 (index.js 참고)
     // obj라고 하면 일반적인 객체 같으니까 parent로 바꿈
-    messages: (parent, args, { db }) => {
+    messages: (parent, { cursor = '' }, { db }) => {
       // console.log({ obj, args, context }); // 각각에 뭐가 들어있는지 나중에 확인할 용도
-      return db.messages;
+      const fromIndex = db.messages.findIndex((msg) => msg.id === cursor) + 1;
+
+      // fromIndex부터 15개씩 가져옴 (무한스크롤)
+      // db.messages가 없을 경우 빈 배열([]) 반환
+      return db.messages?.slice(fromIndex, fromIndex + 15) || [];
     },
     // args 자리에 query에 필요한 파라미터 값(id)이 옴
     // id가 없을 경우를 대비하여 빈 문자열('')로 초기화
