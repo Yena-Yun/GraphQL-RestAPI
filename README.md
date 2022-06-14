@@ -38,7 +38,7 @@ Rest API에서 사용한 routers 내용과 유사 <br/>
 gql 모듈을 사용해 type 지정 후 get 내용은 Query, 그 외 post/update/delete 내용은 Mutation에 정의<br/>
 => 선언적으로 한 눈에 인수와 반환값을 알 수 있는 문법!
 
-## 5. Client: react-query 세팅, Client + Server: Rest API를 GraphQL로 포팅하기
+## 5. Client + Server: react-query 세팅, Rest API 코드를 GraphQL 코드로 바꾸기
 * graphql-tag의 gql 모듈: client에서 GraphQL 문법을 자바스크립트 문법으로 변환
 * client/graphql 경로에서 서버에 요청할 형태(request 형식) 정의하기
   * message.js: GET_MESSAGES, GET_MESSAGE, CREATE_MESSAGE, UPDATE_MESSAGE, DELETE_MESSAGE
