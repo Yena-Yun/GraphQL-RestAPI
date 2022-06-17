@@ -2,14 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import {
   useMutation,
-  useQuery,
+  // useQuery,
   useQueryClient,
   useInfiniteQuery,
 } from 'react-query';
 import MsgInput from './MsgInput';
 import MsgItem from './MsgItem';
 // import fetcher from '../fetcher';
-import { fetcher, QueryKeys } from '../queryClient';
+import {
+  fetcher,
+  QueryKeys,
+  findTargetMsgIndex,
+  getNewMessages,
+} from '../queryClient';
 import {
   GET_MESSAGES,
   CREATE_MESSAGE,
@@ -37,7 +42,7 @@ import useInfiniteScroll from '../hooks/useInfiniteScroll';
 // server의 messages.json에 넣을 내용 콘솔에 출력하는 용도
 // console.log(JSON.stringify(originalMsgs));
 
-const MsgList = ({ smsgs, users }) => {
+const MsgList = ({ smsgs }) => {
   // _app.js의 QueryClientProvider로 내려보낸 client를 전달받음
   // (QueryClientProvider로 감싸져 있는 컴포넌트에서는 다 받을 수 있음)
   const client = useQueryClient();
@@ -50,7 +55,7 @@ const MsgList = ({ smsgs, users }) => {
   const userId = query.userId || query.userid || '';
 
   // const [msgs, setMsgs] = useState(originalMsgs);
-  const [msgs, setMsgs] = useState(smsgs);
+  const [msgs, setMsgs] = useState([{ messages: smsgs }]);
   const [editingId, setEditingId] = useState(null);
   // const { userId } = query;
 
@@ -66,8 +71,14 @@ const MsgList = ({ smsgs, users }) => {
         // 기존 데이터(old)를 받아서 새로운 데이터를 넘겨준다.
         client.setQueryData(QueryKeys.MESSAGES, (old) => {
           return {
+            // 아래 내용 대신 이렇게 수정
+            pageParam: old.pageParam,
+            pages: [
+              { messages: [createMessage, ...old.pages[0].messages] },
+              ...old.pages.slice(1),
+            ],
             // 여기 배열의 순서 중요! (createMessage가 2번째에 있으면 새로운 메시지 추가 시 새로고침해야 화면에 반영됨)
-            messages: [createMessage, ...old.messages],
+            // messages: [createMessage, ...old.messages],
           };
         });
       },
@@ -95,23 +106,41 @@ const MsgList = ({ smsgs, users }) => {
     {
       onSuccess: ({ updateMessage }) => {
         client.setQueryData(QueryKeys.MESSAGES, (old) => {
-          const targetIndex = old.messages.findIndex(
-            (msg) => msg.id === updateMessage.id
-          );
+          // const targetIndex = old.messages.findIndex(
+          // (msg) => msg.id === updateMessage.id
+          // );
           // targetIndex가 없을 수도 있음('-1') => 아무 것도 안 하고 msgs 배열 그대로 반환
-          if (targetIndex < 0) return old;
+          // if (targetIndex < 0) return old;
+          const { pageIndex, msgIndex } = findTargetMsgIndex(
+            old.pages,
+            updateMessage.id
+          );
+          if (pageIndex < 0 || msgIndex < 0) return old;
 
           // otherwise msgs 배열에 새 메시지 추가하기 (수정)
-          const newMsgs = [...old.messages]; // 기존 배열 복사 (사본 만들기)
+          // const newMsgs = [...old.messages]; // 기존 배열 복사 (사본 만들기)
+          // const newPages = [...old.pages]; // 기존 배열 복사 (사본 만들기)
+          const newMsgs = getNewMessages(old); // 기존 배열 복사 (사본 만들기)
+
           // 사본을 조작
-          newMsgs.splice(targetIndex, 1, updateMessage);
+          // newMsgs.splice(targetIndex, 1, updateMessage);
           // newMsgs.splice(targetIndex, 1, {
           //   ...msgs[targetIndex], // 기존 targetIndex의 내용 그대로 가져오고,
           //   text, // text만 새 걸로 넣어줌
           // });
-          return { messages: newMsgs };
-        });
+          // 사본을 조작
+          // newPages[pageIndex] = { messages: [...newPages[pageIndex].messages] };
+          // newPages[pageIndex].messages.splice(msgIndex, 1, updateMessage);
+          // 사본을 조작
+          newMsgs.pages[pageIndex].messages.splice(msgIndex, 1, updateMessage);
 
+          // return { messages: newMsgs };
+          // return {
+          //   pageParam: old.pageParam,
+          //   pages: newPages,
+          // };
+          return newMsgs;
+        });
         //   // update가 끝나면 MsgInput 렌더링을 멈춤 (editingId를 null로 변경)
         setEditingId(null);
       },
@@ -156,21 +185,33 @@ const MsgList = ({ smsgs, users }) => {
       // 'deleteMessage: deletedId' => 사용할 변수에 이곳 스코프에서만 사용할 별칭(alias)를 붙일 수 있다.
       onSuccess: ({ deleteMessage: deletedId }) => {
         client.setQueryData(QueryKeys.MESSAGES, (old) => {
-          const targetIndex = old.messages.findIndex(
-            (msg) => msg.id === deletedId
+          // const targetIndex = old.messages.findIndex(
+          //   (msg) => msg.id === deletedId
+          // );
+          // // targetIndex가 없을 수도 있음('-1') => 아무 것도 안 하고 msgs 배열 그대로 반환
+          // if (targetIndex < 0) return old;
+          const { pageIndex, msgIndex } = findTargetMsgIndex(
+            old.pages,
+            deletedId
           );
-          // targetIndex가 없을 수도 있음('-1') => 아무 것도 안 하고 msgs 배열 그대로 반환
-          if (targetIndex < 0) return old;
+          if (pageIndex < 0 || msgIndex < 0) return old;
 
           // otherwise msgs 배열에 새 메시지 추가하기 (수정)
-          const newMsgs = [...old.messages]; // 기존 배열 복사 (사본 만들기)
+          // const newMsgs = [...old.messages]; // 기존 배열 복사 (사본 만들기)
+          const newMsgs = getNewMessages(old); // 기존 배열 복사 (사본 만들기)
+
           // 사본을 조작
-          newMsgs.splice(targetIndex, 1);
           // newMsgs.splice(targetIndex, 1, {
           //   ...msgs[targetIndex], // 기존 targetIndex의 내용 그대로 가져오고,
           //   text, // text만 새 걸로 넣어줌
           // });
-          return { messages: newMsgs };
+          // 사본을 조작
+          // newMsgs.splice(targetIndex, 1);
+          // 사본을 조작
+          newMsgs.pages[pageIndex].messages.splice(msgIndex, 1);
+
+          // return { messages: newMsgs };
+          return newMsgs;
         });
       },
     }
@@ -248,11 +289,14 @@ const MsgList = ({ smsgs, users }) => {
 
     // react-query 이후 윗줄 변경
     // data.pages는 키가 messages인 여러 배열을 하나로 합친 것
-    // const data.pages = [ { messages: [...] }, { messages: [...] } ] => [...]
-    // flatMap: depth 1단계에 대한 내용들을 하나로 합쳐줌
-    const mergedMsgs = data.pages.flatMap((d) => d.messages);
-    console.log({ mergedMsgs });
-    setMsgs(mergedMsgs);
+    // const data.pages = [ { messages: [...] }, { messages: [...] } ] => [{…}, {…}, ...]
+    // flatMap: depth 1단계에 대한 내용들을 하나로 합쳐서 새로운 배열로 반환
+    // const mergedMsgs = data.pages.flatMap((d) => d.messages);
+    // console.log(mergedMsgs);
+    // setMsgs(mergedMsgs);
+
+    // 위의 flatMap 방법은 data 구조를 직접 변경 => 이것보다는 data.pages를 받은 쪽에서 렌더링을 할 때 구조를 변경해서 렌더링 해주는 편이 낫다.
+    setMsgs(data.pages);
   }, [data?.pages]); // data.messages를 확인하여 변경사항이 있을 때만 내부문 실행
 
   if (isError) {
@@ -287,18 +331,24 @@ const MsgList = ({ smsgs, users }) => {
       {/* (URL에 지정된) userId가 없으면 아예 맨 위의 input창이 뜨지 않도록 함 */}
       {userId && <MsgInput mutate={onCreate} />}
       <ul className='messages'>
-        {msgs.map((x) => (
-          <MsgItem
-            key={x.id}
-            {...x}
-            onUpdate={onUpdate}
-            onDelete={() => onDelete(x.id)}
-            startEdit={() => setEditingId(x.id)}
-            isEditing={editingId === x.id}
-            myId={userId}
-            user={users.find((x) => userId === x.id)}
-          />
-        ))}
+        {msgs.map(({ messages }, pageIndex) =>
+          messages.map((x) => (
+            <MsgItem
+              key={pageIndex + x.id}
+              {...x}
+              onUpdate={onUpdate}
+              onDelete={() => onDelete(x.id)}
+              startEdit={() => setEditingId(x.id)}
+              isEditing={editingId === x.id}
+              myId={userId}
+              // 아랫줄은 각 메시지마다 user 정보를 내려주기 위한 코드인데,
+              // messageResolver에 user를 추가정보로 넣고 graphql의 message에서도 user 정보를 추가로 요청하면
+              // MsgList를 받아올 때부터 이미 user 정보를 갖고 있게 되어서 아래 코드가 불필요해짐
+              // (맨 위의 MsgList의 props에서도 이미 graphql 요청 시 user 정보를 받아오므로 users를 받아올 필요가 없어짐 => smsgs만 props로 받아옴)
+              // user={users.find((x) => userId === x.id)}
+            />
+          ))
+        )}
       </ul>
       <div ref={fetchMoreEl} />
     </>

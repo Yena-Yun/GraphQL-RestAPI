@@ -30,6 +30,26 @@ export const QueryKeys = {
   USER: 'USER',
 };
 
+// 수정할 메시지의 index(= targetIndex) 알아내기
+// 전체 pages에서 id를 찾아내는 것이 목적
+export const findTargetMsgIndex = (pages, id) => {
+  let msgIndex = -1; // 메시지를 못 찾을 때를 대비해서 미리 -1을 넣어놓는다.
+  const pageIndex = pages.findIndex(({ messages }) => {
+    msgIndex = messages.findIndex((msg) => msg.id === id);
+    // 수정할 메시지가 찾아졌을 경우에 한해서 true 반환
+    if (msgIndex > -1) {
+      return true;
+    }
+    return false;
+  });
+  return { pageIndex, msgIndex };
+};
+
+export const getNewMessages = (old) => ({
+  pageParams: old.pageParams,
+  pages: old.pages.map(({ messages }) => ({ messages: [...messages] })),
+});
+
 /**
  * get: axios.get(url[, config])
  * delete: axios.delete(url[, config])

@@ -13,7 +13,8 @@ const messageSchema = gql`
     id: ID!
     text: String!
     userId: ID!
-    timestamp: Float
+    user: User!
+    timestamp: Float # 13자리 숫자
   }
 
   extend type Query {

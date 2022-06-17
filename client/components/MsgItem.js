@@ -15,7 +15,7 @@ const MsgItem = ({
   return (
     <li className='messages__item'>
       <h3>
-        {user?.nickname}
+        {user.nickname}
         <sub>
           {new Date(timestamp).toLocaleString('ko-KR', {
             year: 'numeric',
@@ -30,7 +30,7 @@ const MsgItem = ({
 
       {isEditing ? <MsgInput mutate={onUpdate} id={id} text={text} /> : text}
 
-      {myId === userId && (
+      {myId === user.id && (
         <div className='messages__buttons'>
           <button onClick={startEdit}>수정</button>
           <button onClick={onDelete}>삭제</button>

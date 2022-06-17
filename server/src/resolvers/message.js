@@ -85,6 +85,12 @@ const messageResolver = {
       return id; // (삭제 성공 시) 삭제한 id 반환
     },
   },
+
+  // messageResolver 안에 다음처럼 추가 정보(유저 관련)를 넣을 수 있다.
+  Message: {
+    // user라는 필드에 db.users[msg.userId] 값 반환
+    user: (msg, args, { db }) => db.users[msg.userId],
+  },
 };
 
 export default messageResolver;
