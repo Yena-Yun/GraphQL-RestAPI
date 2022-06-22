@@ -1,7 +1,7 @@
 # GraphQL-RestAPI
 인프런 풀스택 리액트 토이프로젝트 강의 (Next.js, GraphQL/RestAPI)
 
-# 🍰 배운 내용
+# 🍰 배운 내용 정리
 ## 1. Client: 기본 기능 구현
 1. Next.js 세팅 
 2. 기본 message 관련 CRUD(생성, 조회, 수정, 삭제) 기능 구현
@@ -41,7 +41,7 @@ GraphQL의 resolvers는 Rest API의 routers와 유사<br/>
 * GraphQL은 **gql 모듈**을 사용하여 type을 지정한 후, get은 Query에 나머지 post/update/delete는 Mutation에 정의<br/><BR/>
 => GraphQL이 Rest API보다 선언적으로 한 눈에 인수와 반환값을 알 수 있음
 
-## 5. Client + Server: react-query 세팅, Rest API 코드를 GraphQL 코드로 바꾸기
+## 5. Client + Server: react-query 세팅, Rest API를 GraphQL로 교체
 * Server에서는 apollo-server-express의 gql 모듈을 사용하지만 Client에서는 graphql-tag의 gql 모듈 사용
   <br/>: client에서 GraphQL 문법을 JS 문법으로 변환
 * client/graphql - graphQL 통신 시의 요청 형태 정의하기
