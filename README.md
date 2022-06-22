@@ -63,3 +63,7 @@ GraphQL의 resolvers는 Rest API의 routers와 유사<br/>
 * baseURL('http://localhost:8000 ') 을 기존의 axios.defaults.baseURL 대신, 상수로 선언 후에 뒤에 **/graphql** 경로 추가 <br/>
     => Rest API는 기본 url 뒤에 각각 CRUD에 맞는 서버를 호출할 경로를 매번 붙여주지만(/message, /user, /message/:id, ..), <br/>
        GraphQL은 '/graphql' 경로 하나로 모든 CRUD 호출을 처리
+
+## 기존 Rest API의 무한스크롤 로직 대체 (useInfiniteQuery)
+### useInfiniteQuery
+
