@@ -3,26 +3,26 @@
 
 # 🍰 배운 내용 정리
 ## 1. Client: 기본 기능 구현
-1. Next.js 세팅 
-2. 기본 message 관련 CRUD(생성, 조회, 수정, 삭제) 기능 구현
+* Next.js 세팅 
+* 기본 message 관련 CRUD(생성, 조회, 수정, 삭제) 기능 구현
 
 ## 2. Server: 기본 DB 구현
-3. express를 활용한 미니 DB 구현 -> messages 및 users 데이터 관리
+* express를 활용한 미니 DB 구현 -> messages 및 users 데이터 관리
 
 ## 3. Client: REST API 통신 구현
-4. 미니 로그인 구현
+* 미니 로그인 구현
    * userId가 url에 포함되어 있을 때만 최상단의 input창 렌더링 (= 로그인 안 되면 메시지 추가 못하도록)
    * url에 포함된 userId(= 로그인한 유저)의 메시지만 수정 및 삭제되도록
-5. axios 통신과 관련된 커스텀 훅(fetcher.js)을 작성하여 MsgList의 각 CRUD 함수에 사용
-7. routes 폴더로 관심사 분리(SoC) <BR/> => 각 CRUD마다 axios에 들어갈 옵션을 따로 설정한 후 커스텀 훅(fetcher)을 입혀서 사용
-8. Next.js의 useRouter 훅 사용 (=> query 객체를 통해 userId를 받아옴) 
-9. ** props에 바로 초기값 설정하기 (JS new문법) <br/> 예: { text = ' ', id = undefined }
-10. 날짜 format 설정 <br/> => new Date로 date 객체로 변환 후 toLocaleString()의 옵션 활용 <BR/>
+* axios 통신과 관련된 커스텀 훅(fetcher.js)을 작성하여 MsgList의 각 CRUD 함수에 사용
+* routes 폴더로 관심사 분리(SoC) <BR/> => 각 CRUD마다 axios에 들어갈 옵션을 따로 설정한 후 커스텀 훅(fetcher)을 입혀서 사용
+* Next.js의 useRouter 훅 사용 (=> query 객체를 통해 userId를 받아옴) 
+* ** props에 바로 초기값 설정하기 (JS new문법) <br/> 예: { text = ' ', id = undefined }
+* 날짜 format 설정 <br/> => new Date로 date 객체로 변환 후 toLocaleString()의 옵션 활용 <BR/>
 
   <img src="https://user-images.githubusercontent.com/68722179/174944821-134e9838-f2d1-4d0f-b432-d3d0be2b2b89.png" width="400" />
 
-12. 무한스크롤 구현 <br/> => 처음에 모든 messages 데이터를 다 가져오지 않고 일부만 가져온 뒤 스크롤 위치에 따라 추가 fetch 하도록
-13. 서버사이드렌더링 구현 <br/>
+* 무한스크롤 구현 <br/> => 처음에 모든 messages 데이터를 다 가져오지 않고 일부만 가져온 뒤 스크롤 위치에 따라 추가 fetch 하도록
+* 서버사이드렌더링 구현 <br/>
  => 처음에 받아오는 메시지가 서버쪽에서 렌더링 되도록 (=> 첫 로딩 시 화면 깜박임이 사라진다)
 
 ## 4. Server: GraphQL 구현
@@ -31,8 +31,8 @@
 * GraphQL은 '/graphql'이라는 API 하나로 CRUD의 API를 모두 처리한다. (resolvers = Rest API의 router)
   
 ### schema 정의
-12. apollo-server-express의 gql 모듈을 통해 schema(= graphQL 통신 시의 응답값 형태) 설정
-13. schema 폴더의 index.js - 생성된 schema들과 linkSchema(default 스키마)를 한데 모아 export하는 역할
+* apollo-server-express의 gql 모듈을 통해 schema(= graphQL 통신 시의 응답값 형태) 설정
+* schema 폴더의 index.js - 생성된 schema들과 linkSchema(default 스키마)를 한데 모아 export하는 역할
 
 ### resolvers 정의
 GraphQL의 resolvers는 Rest API의 routers와 유사<br/>
