@@ -36,7 +36,7 @@
 
 ### resolvers 정의
 GraphQL의 resolvers는 Rest API의 routers와 유사<br/>
-단, Rest API에서는 message와 user 각각 get/post/update/delete에 해당하는 axios의 옵션(method, route, handler)들을<br/> 
+단, Rest API에서는 message와 user 각각 get/post/update/delete에 해당하는 axios의 옵션(method, route, handler)을<br/> 
 각 route마다 일일이 지정하지만, GraphQL에서 route 경로는 '/graphql' 하나뿐
 * GraphQL은 **gql 모듈**을 사용하여 type을 지정한 후, get은 Query에 나머지 post/update/delete는 Mutation에 정의<br/><BR/>
 => GraphQL이 Rest API보다 선언적으로 한 눈에 인수와 반환값을 알 수 있음
