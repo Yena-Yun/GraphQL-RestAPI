@@ -101,7 +101,7 @@ ref가 하단에 닿는 경우가 한 번이라도 있으면 intersecting 상태
 json-server를 더 사용하기 쉽게 만들어주는 라이브러리 <br/>
 lowDB를 사용하여 Rest API를 수정한 버전과 GraphQL을 수정한 버전 2가지를 작업
 
-[lowDB 도입으로 인한 변경사항]
+#### [lowDB 도입으로 인한 변경사항]
   * 기존의 readDB 함수 대신 db.read()로 db 데이터를 바로 읽어와서 db.data(~.messages 또는 ~.users)로 반환
   * 기존의 writeDB 함수는 db.write()로 완전히 대체
   * messages.json과 user.json을 하나로 합쳐서 db.json 파일 하나에 모음
