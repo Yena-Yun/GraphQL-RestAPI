@@ -64,6 +64,34 @@ GraphQL의 resolvers는 Rest API의 routers와 유사<br/>
     => Rest API는 기본 url 뒤에 각각 CRUD에 맞는 서버를 호출할 경로를 매번 붙여주지만(/message, /user, /message/:id, ..), <br/>
        GraphQL은 '/graphql' 경로 하나로 모든 CRUD 호출을 처리
 
-## 기존 Rest API의 무한스크롤 로직 대체 (useInfiniteQuery)
-### useInfiniteQuery
+## 6. Client + Server: 기존 Rest API의 무한스크롤 대체 (=> useInfiniteQuery)
+### 무한스크롤 개념
+첫 렌더링 시 전체 리스트를 다 불러오지 않고 지정한 부분까지만 불러온 다음, <br/>
+IntersectionObserver로 ref로 지정한 부분이 하단에 닿는지 감시하고 있다가 <br/>
+ref가 하단에 닿는 경우가 한 번이라도 있으면 intersecting 상태를 변경시켜 다음 내용을 불러온다(fetchNext).
+
+* 하단 감시하기
+  * fetchMoreEl을 useRef로 선언
+  * intersecting: useInfiniteScroll에 fetchMoreEl을 전달하여 반환된 값(boolean)
+  
+<img src="https://user-images.githubusercontent.com/68722179/175457831-e195d264-95d6-4bcf-a842-1996b51dc535.png" width="500" />
+
+
+* 다음 내용 불러오기 
+  * useInfiniteQuery()의 옵션에서 pageParam과 getNextPageParam 활용
+
+<img src="https://user-images.githubusercontent.com/68722179/175456461-26677a6e-2f5a-4259-9074-cf1bc0584fa6.png" width="550" />
+
+* 받아온 데이터로 msgs(렌더링할 메시지) 교체
+  * useEffect 내에서 진행
+  * data(useInfiniteQuery에서 꺼냄).pages가 없으면 return 반환, <br/>
+    있으면 data.pages를 flatMap으로 '평평하게 만들어서' mergedMsgs 생성
+  
+<img src="https://user-images.githubusercontent.com/68722179/175457429-e585dec5-2cb6-42d6-bc39-7acfc72b78e8.png" width="600" />
+
+* 무한스크롤 실행
+  * intersecting과 hasNextPage 값이 true이면 fetchNextPage 메서드를 호출하여 무한스크롤 실행
+  * (hasNextPage와 fetchNextPage는 useInfiniteQuery에서 꺼냄)
+  
+<img src="https://user-images.githubusercontent.com/68722179/175458074-40ad7e7e-6e19-4225-8482-72a9de70cac6.png" width="700" />
 
