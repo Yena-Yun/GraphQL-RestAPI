@@ -1,21 +1,21 @@
 import { v4 } from 'uuid';
 
-// LowDB 사용하면 readDB, writeDB 필요 없어짐
-// import { readDB, writeDB } from '../dbController.js'; // 뒤에 .js 붙여줘야
-import db from '../dbController.js';
+// LowDB 사용하면 readDB, writeDB 필요 없어짐 (Rest API, GraphQL에서는 그대로 사용)
+import { readDB, writeDB } from '../dbController.js'; // 뒤에 .js 붙여줘야
+// import db from '../dbController.js';
 
-// LowDB 사용하면 getMsgs가 다음과 같이 교체됨
-// const getMsgs = () => readDB('messages');
-const getMsgs = () => {
-  // 먼저 db 전체를 읽어옴
-  db.read();
-  // lowDB는 한번 불러오면 DB 데이터가 캐싱되어 있음 => 데이터가 있을 때와 없을 때를 구분 (안전장치 걸기)
-  db.data = db.data || { messages: [] }; // db.data가 없으면 messages를 빈 배열로 설정
-  return db.data.messages;
-};
+// LowDB 사용하면 getMsgs가 다음과 같이 교체됨 (Rest API, GraphQL에서는 교체 안함)
+const getMsgs = () => readDB('messages');
+// const getMsgs = () => {
+//   // 먼저 db 전체를 읽어옴
+//   db.read();
+//   // lowDB는 한번 불러오면 DB 데이터가 캐싱되어 있음 => 데이터가 있을 때와 없을 때를 구분 (안전장치 걸기)
+//   db.data = db.data || { messages: [] }; // db.data가 없으면 messages를 빈 배열로 설정
+//   return db.data.messages;
+// };
 
-// LowDB 사용하면 db.write() 사용하면 돼서 setMsgs나 writeDB가 따로 필요없음
-// const setMsgs = (data) => writeDB('messages', data);
+// LowDB 사용하면 db.write() 사용하면 돼서 setMsgs나 writeDB가 따로 필요없음 (Rest API, GraphQL에서는 그대로 사용)
+const setMsgs = (data) => writeDB('messages', data);
 
 const messagesRoute = [
   {
@@ -84,13 +84,13 @@ const messagesRoute = [
           text: body.text,
         };
 
-        // msgs.unshift(newMsg); // 원본 배열 맨 앞에 추가 (직접 수정)
-        // setMsgs(msgs); // 추가된 msgs로 DB 수정 (setMsgs === writeDB)
+        msgs.unshift(newMsg); // 원본 배열 맨 앞에 추가 (직접 수정)
+        setMsgs(msgs); // 추가된 msgs로 DB 수정 (setMsgs === writeDB)
 
-        // lowDB 사용하면 msgs, setMsgs 거치지 않고 db에 바로 추가 가능
-        db.data.messages.unshift(newMsg);
-        // db.write() 명령어를 해줘야 변경사항이 실제 db에 기록됨
-        db.write();
+        // // lowDB 사용하면 msgs, setMsgs 거치지 않고 db에 바로 추가 가능 (Rest API)
+        // db.data.messages.unshift(newMsg);
+        // // db.write() 명령어를 해줘야 변경사항이 실제 db에 기록됨
+        // db.write();
 
         res.send(newMsg); // 클라에 새로 만든 메시지 반환 (=> 요청 성공 시 새로 만든 메시지 반환)
       } catch (err) {
@@ -125,13 +125,13 @@ const messagesRoute = [
         // 기존의 내용 그대로 넣고 text만 바꿔준다. (spread 활용)
         const newMsg = { ...msgs[targetIndex], text: body.text };
 
-        // msgs.splice(targetIndex, 1, newMsg);
-        // setMsgs(msgs); // 수정된 메시지가 포함된 msgs 배열로 DB 수정
+        msgs.splice(targetIndex, 1, newMsg);
+        setMsgs(msgs); // 수정된 메시지가 포함된 msgs 배열로 DB 수정
 
-        // lowDB 사용하면 msgs, setMsgs 거치지 않고 db를 바로 수정 가능
-        db.data.messages.splice(targetIndex, 1, newMsg);
-        // db.write() 명령어를 해줘야 변경사항이 실제 db에 기록됨
-        db.write();
+        // // lowDB 사용하면 msgs, setMsgs 거치지 않고 db를 바로 수정 가능 (Rest API)
+        // db.data.messages.splice(targetIndex, 1, newMsg);
+        // // db.write() 명령어를 해줘야 변경사항이 실제 db에 기록됨
+        // db.write();
 
         res.send(newMsg); // 클라에 수정한 메시지 반환
       } catch (err) {
@@ -154,13 +154,13 @@ const messagesRoute = [
         if (targetIndex < 0) throw '메시지가 없습니다.';
         if (msgs[targetIndex].userId !== userId) throw '사용자가 다릅니다.';
 
-        // msgs.splice(targetIndex, 1);
-        // setMsgs(msgs); // 특정 메시지가 삭제된 msgs 배열로 DB 수정
+        msgs.splice(targetIndex, 1);
+        setMsgs(msgs); // 특정 메시지가 삭제된 msgs 배열로 DB 수정
 
-        // lowDB 사용하면 msgs, setMsgs 거치지 않고 db를 바로 수정 가능
-        db.data.messages.splice(targetIndex, 1);
-        // db.write() 명령어를 해줘야 변경사항이 실제 db에 기록됨
-        db.write();
+        // // lowDB 사용하면 msgs, setMsgs 거치지 않고 db를 바로 수정 가능 (Rest API)
+        // db.data.messages.splice(targetIndex, 1);
+        // // db.write() 명령어를 해줘야 변경사항이 실제 db에 기록됨
+        // db.write();
 
         res.send(id); // 삭제 성공 시 클라이언트에 삭제한 id만 반환(= return 값)
       } catch (err) {

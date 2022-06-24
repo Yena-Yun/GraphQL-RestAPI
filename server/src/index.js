@@ -6,7 +6,15 @@ import { ApolloServer } from 'apollo-server-express';
 // import usersRoute from './routes/users.js'; // (마찬가지)
 import resolvers from './resolvers/index.js';
 import schema from './schema/index.js';
-import { readDB } from './dbController.js'; // GraphQL의 경우 readDB를 여기서 가져옴!
+
+// lowDB 사용하면 readDB 내용 교체됨
+// import { readDB } from './dbController.js'; // GraphQL의 경우 readDB를 여기서 가져옴!
+import db from './dbController.js';
+
+const readDB = () => {
+  db.read();
+  return db.data; // messages와 user 데이터가 모두 들어있음
+};
 
 // express.urlencoded: 미들웨어, extended 옵션 설정 필수
 // extended가 false이면 Node.js에 기본 내장된 querystring 모듈 사용, true이면 추가로 설치 필요한 qs 모듈 사용
@@ -31,10 +39,11 @@ const server = new ApolloServer({
   resolvers,
   // context의 models = DB (Rest API에서의 readDB 부분)
   context: {
-    db: {
-      messages: readDB('messages'),
-      users: readDB('users'),
-    },
+    // db: {
+    //   messages: readDB('messages'),
+    //   users: readDB('users'),
+    // },
+    models: readDB(), // 여기서 키를 db라고 하면 위에서 불러온 db와 헷갈려서 resolvers에서 문제가 될 수 있음 => models로 교체
   },
 });
 

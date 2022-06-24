@@ -1,6 +1,12 @@
 {
   "messages": [
     {
+      "id": "7785d4e0-7262-4131-97df-a27b5fcf95dc",
+      "userId": "roy",
+      "timestamp": 1656047407965,
+      "text": "tomboy"
+    },
+    {
       "id": "f297dced-5f26-423e-9d61-73e27d303228",
       "userId": "jay",
       "timestamp": 1656042852543,
@@ -41,12 +47,6 @@
       "userId": "roy",
       "timestamp": 1654839178495,
       "text": "graphQL 재밌지만 어렵다 ㅠ-ㅠ"
-    },
-    {
-      "id": "dad9de50-ce68-463e-9130-eccb07935838",
-      "userId": "roy",
-      "timestamp": 1654508330092,
-      "text": "grwghhh"
     },
     {
       "id": "4fb89c84-d354-43dc-85a0-bfe72a47bbc3",
@@ -350,7 +350,13 @@
     }
   ],
   "users": {
-    "roy": { "id": "roy", "nickname": "로이" },
-    "jay": { "id": "jay", "nickname": "제이" }
+    "roy": {
+      "id": "roy",
+      "nickname": "로이"
+    },
+    "jay": {
+      "id": "jay",
+      "nickname": "제이"
+    }
   }
 }
