@@ -3,7 +3,9 @@
 import { v4 } from 'uuid';
 // GraphQL에서는 index.js의 server - context - models에서 DB를 불러오므로
 // readDB가 필요 없음(db를 수정하는 writeDB만 필요)
-import { writeDB } from '../dbController.js';
+// import { writeDB } from '../dbController.js';
+
+// LowDB 사용하면 writeDB 없이 그냥 db.write() 쓰면 됨
 
 const setMsgs = (data) => writeDB('messages', data);
 
