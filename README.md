@@ -1,6 +1,16 @@
 # GraphQL-RestAPI
 인프런 풀스택 리액트 토이프로젝트 강의 (Next.js, GraphQL/RestAPI)
 
+# 🧚‍♀️ 사용 스택
+* Javascript / React
+
+* REST API or GraphQL
+
+* Node.js / express / Apollo-server / react-query
+* Next.js
+
+* LowDB / json-server
+
 # 🍰 배운 내용 정리
 ## 1. Client: 기본 기능 구현
 * Next.js 세팅 
@@ -110,5 +120,9 @@ lowDB를 사용하여 Rest API를 수정한 버전과 GraphQL을 수정한 버�
     => context를 사용했던 다른 파일들에도 변경사항 모두 반영
 
 ### json-server
+* _start, _end: 무한스크롤 사용 시 cursor에 닿을 때마다 받아올 페이지 범위
+* _sort, _order: timestamp(_sort)를 기준으로 내림차순(_order="desc")으로 받아옴
+* 프론트엔드 개발자들의 연습용으로 만들어진 것이기 때문에 실무에서는 거의 사용할 일 없음 
+  => 실무에서는 대부분 서버쪽에서 express 사용 - 백엔드 개발자와 협의할 일 있을 때
 
   
