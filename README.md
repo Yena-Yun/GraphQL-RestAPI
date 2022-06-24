@@ -1,58 +1,97 @@
 # GraphQL-RestAPI
 인프런 풀스택 리액트 토이프로젝트 강의 (Next.js, GraphQL/RestAPI)
 
-# 🍰 배운 내용
+# 🍰 배운 내용 정리
 ## 1. Client: 기본 기능 구현
-1. Next.js 세팅 
-2. 기본 message 관련 CRUD(생성, 조회, 수정, 삭제) 기능 구현
+* Next.js 세팅 
+* 기본 message 관련 CRUD(생성, 조회, 수정, 삭제) 기능 구현
 
 ## 2. Server: 기본 DB 구현
-3. express를 활용한 미니 DB 구현 -> messages 및 users data 관리
+* express를 활용한 미니 DB 구현 -> messages 및 users 데이터 관리
 
 ## 3. Client: REST API 통신 구현
-4. 미니 로그인 기능 구현
-   * userId가 url에 있을 때만 최상단의 input창 렌더링 (= 로그인 안 되면 메시지 생성 못하도록)
-   * url에 지정된 userId의 메시지만 수정 및 삭제 가능 (= 로그인한 유저가 자신의 메시지만 수정 가능하도록)
-5. axios 통신 관련 custom hook(fetcher.js) 작성하여 활용 <BR/> => fetcher 메서드를 MsgList의 각 CRUD 함수에 사용
-6. routes 폴더 내용으로 관심사의 분리(SoC) <BR/> => 각 CRUD마다 axios에 들어갈 옵션을 따로 설정한 후 커스텀 훅(fetcher)을 입혀서 사용
-7. Next.js의 useRouter 훅 사용 (query 객체를 통해 userId를 받아옴) 
-8. props에 초기값 설정하는 법 <br/> => 자바스크립트 신(new)문법 / 예: { text = '', id = undefined }
-9. 날짜 format 설정하기 <br/> => new Date로 date 객체로 변환 후 toLocaleString()의 옵션 활용
-10. 무한스크롤 구현 <br/> => 처음에 모든 messages 데이터를 다 가져오지 않고 일부만 가져온 뒤 스크롤 위치에 따라 추가 fetch 하도록
-11. 서버사이드렌더링 구현 <br/>
- => 처음에 받아오는 메시지가 서버쪽에서 렌더링 되도록 (첫 로딩 시 화면 깜박임 사라짐)
+* 미니 로그인 구현
+   * userId가 url에 포함되어 있을 때만 최상단의 input창 렌더링 (= 로그인 안 되면 메시지 추가 못하도록)
+   * url에 포함된 userId(= 로그인한 유저)의 메시지만 수정 및 삭제되도록
+* axios 통신과 관련된 커스텀 훅(fetcher.js)을 작성하여 MsgList의 각 CRUD 함수에 사용
+* routes 폴더로 관심사 분리(SoC) <BR/> => 각 CRUD마다 axios에 들어갈 옵션을 따로 설정한 후 커스텀 훅(fetcher)을 입혀서 사용
+* Next.js의 useRouter 훅 사용 (=> query 객체를 통해 userId를 받아옴) 
+* ** props에 바로 초기값 설정하기 (JS new문법) <br/> 예: { text = ' ', id = undefined }
+* 날짜 format 설정 <br/> => new Date로 date 객체로 변환 후 toLocaleString()의 옵션 활용 <BR/>
+
+  <img src="https://user-images.githubusercontent.com/68722179/174944821-134e9838-f2d1-4d0f-b432-d3d0be2b2b89.png" width="400" />
+
+* 무한스크롤 구현 <br/> => 처음에 모든 messages 데이터를 다 가져오지 않고 일부만 가져온 뒤 스크롤 위치에 따라 추가 fetch 하도록
+* 서버사이드렌더링 구현 <br/>
+ => 처음에 받아오는 메시지가 서버쪽에서 렌더링 되도록 (=> 첫 로딩 시 화면 깜박임이 사라진다)
 
 ## 4. Server: GraphQL 구현
-### Rest API와 비교한 GraphQL의 특징
-* Rest API는 CRUD마다 각각 API URL이 달라짐 (Route 개념)
-* GraphQL은 (예를 들면) '/graphql'이라는 API 하나로 CRUD API를 모두 처리 
-  => resolvers가 Rest API에서의 routers 역할 담당
+### Rest API vs. GraphQL
+* Rest API는 CRUD마다 각각 API URL이 달라진다.
+* GraphQL은 '/graphql'이라는 API 하나로 CRUD의 API를 모두 처리한다. (resolvers = Rest API의 router)
   
-#### schema 정의
-12. apollo-server-express 라이브러리의 gql 모듈을 통해 schema(graphQL 통신 시의 응답값) 설정
-13. schema 폴더 내의 index.js에서 만든 스키마들과 index.js 내에서 정의한 linkSchema(default 스키마)를 모아 export
-#### resolvers 정의
-Rest API에서 사용한 routers 내용과 유사 <br/>
-단, routers에서는 message와 user 각각 get/post/update/delete에 해당하는 axios의 옵션(method, route, handler)들을 <br/>
-각 route마다 일일이 지정했지만 graphQL에서는 route는 /graphql 하나뿐이고 resolvers의 message 안에서<br/>
-gql 모듈을 사용해 type 지정 후 get 내용은 Query, 그 외 post/update/delete 내용은 Mutation에 정의<br/>
-=> 선언적으로 한 눈에 인수와 반환값을 알 수 있는 문법!
+### schema 정의
+* apollo-server-express의 gql 모듈을 통해 schema(= graphQL 통신 시의 응답값 형태) 설정
+* schema 폴더의 index.js - 생성된 schema들과 linkSchema(default 스키마)를 한데 모아 export하는 역할
 
-## 5. Client + Server: react-query 세팅, Rest API 코드를 GraphQL 코드로 바꾸기
-* graphql-tag의 gql 모듈: client에서 GraphQL 문법을 자바스크립트 문법으로 변환
-* client/graphql 경로에서 서버에 요청할 형태(request 형식) 정의하기
+### resolvers 정의
+GraphQL의 resolvers는 Rest API의 routers와 유사<br/>
+단, Rest API에서는 message와 user 각각 get/post/update/delete에 해당하는 axios의 옵션(method, route, handler)을<br/> 
+각 route마다 일일이 지정하지만, GraphQL에서 route 경로는 '/graphql' 하나뿐
+* GraphQL은 **gql 모듈**을 사용하여 type을 지정한 후, get은 Query에 나머지 post/update/delete는 Mutation에 정의<br/><BR/>
+=> GraphQL이 Rest API보다 선언적으로 한 눈에 인수와 반환값을 알 수 있음
+
+## 5. Client + Server: react-query 세팅, Rest API를 GraphQL로 교체
+* Server에서는 apollo-server-express의 gql 모듈을 사용하지만 Client에서는 graphql-tag의 gql 모듈 사용
+  <br/>: client에서 GraphQL 문법을 JS 문법으로 변환
+* client/graphql - graphQL 통신 시의 요청 형태 정의하기
   * message.js: GET_MESSAGES, GET_MESSAGE, CREATE_MESSAGE, UPDATE_MESSAGE, DELETE_MESSAGE
   * user.js: GET_USERS, GET_USER
 
-* _app.js에서 QueryClientProvider로 Component(프로젝트의 모든 컴포넌트)를 감싸고, <br/>
-  ref에 QueryClient를 할당하는 getClient 함수를 client props에 할당
-* 최상단 index.js에서는 기존의 fetcher 메서드의 인자인 method, url을 <br/>
-  client/graphql 경로에서 gql로 형성한 request 형태(예: GET_MESSAGES)로 대체
+* _app.js - QueryClientProvider로 Component(프로젝트의 모든 컴포넌트)를 감싸고, client props에 getClient 함수 할당 <br/>
 
-[ 기존의 fetcher.js 변경사항 ]
+  <img src="https://user-images.githubusercontent.com/68722179/174946983-74a71847-2a01-45aa-8edd-7c07af8f0e2e.png" width="400" />
+
+  <img src="https://user-images.githubusercontent.com/68722179/174947032-3021b6bf-b01a-47dc-8d6c-a2dfa7c0aa96.png" width="700" />
+
+
+* 최상단 index.js - 기존의 fetcher 메서드의 인자인 method, url을 <br/>client/graphql에서 gql 모듈로 형성한 요청 형식(예: GET_MESSAGES)으로 대체
+
+[ 기존의 fetcher.js에서 변경된 사항 ]
 * 파일명을 queryclient.js로 변경
 * axios 대신 graphql-request의 request 모듈 사용
-* 기존의 axios.defaults.baseURL 대신 대문자 URL 상수 선언 + 'http://localhost:8000' 뒤에 **/graphql** 경로 추가 <br/>
+* baseURL('http://localhost:8000 ') 을 기존의 axios.defaults.baseURL 대신, 상수로 선언 후에 뒤에 **/graphql** 경로 추가 <br/>
     => Rest API는 기본 url 뒤에 각각 CRUD에 맞는 서버를 호출할 경로를 매번 붙여주지만(/message, /user, /message/:id, ..), <br/>
        GraphQL은 '/graphql' 경로 하나로 모든 CRUD 호출을 처리
-* axios 대신 request 모듈을 사용한 실행문으로 fetcher 함수 변경
+
+## 6. Client + Server: 기존 Rest API의 무한스크롤 대체 (=> useInfiniteQuery)
+### 무한스크롤 개념
+첫 렌더링 시 전체 리스트를 다 불러오지 않고 지정한 부분까지만 불러온 다음, <br/>
+IntersectionObserver로 ref로 지정한 부분이 하단에 닿는지 감시하고 있다가 <br/>
+ref가 하단에 닿는 경우가 한 번이라도 있으면 intersecting 상태를 변경시켜 다음 내용을 불러온다(fetchNext).
+
+* 하단 감시하기
+  * fetchMoreEl을 useRef로 선언
+  * intersecting: useInfiniteScroll에 fetchMoreEl을 전달하여 반환된 값(boolean)
+  
+<img src="https://user-images.githubusercontent.com/68722179/175457831-e195d264-95d6-4bcf-a842-1996b51dc535.png" width="500" />
+
+
+* 다음 내용 불러오기 
+  * useInfiniteQuery()의 옵션에서 pageParam과 getNextPageParam 활용
+
+<img src="https://user-images.githubusercontent.com/68722179/175456461-26677a6e-2f5a-4259-9074-cf1bc0584fa6.png" width="550" />
+
+* 받아온 데이터로 msgs(렌더링할 메시지) 교체
+  * useEffect 내에서 진행
+  * data(useInfiniteQuery에서 꺼냄).pages가 없으면 return 반환, <br/>
+    있으면 data.pages를 flatMap으로 '평평하게 만들어서' mergedMsgs 생성
+  
+<img src="https://user-images.githubusercontent.com/68722179/175457429-e585dec5-2cb6-42d6-bc39-7acfc72b78e8.png" width="600" />
+
+* 무한스크롤 실행
+  * intersecting과 hasNextPage 값이 true이면 fetchNextPage 메서드를 호출하여 무한스크롤 실행
+  * (hasNextPage와 fetchNextPage는 useInfiniteQuery에서 꺼냄)
+  
+<img src="https://user-images.githubusercontent.com/68722179/175458074-40ad7e7e-6e19-4225-8482-72a9de70cac6.png" width="700" />
+
