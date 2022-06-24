@@ -95,3 +95,20 @@ ref가 하단에 닿는 경우가 한 번이라도 있으면 intersecting 상태
   
 <img src="https://user-images.githubusercontent.com/68722179/175458074-40ad7e7e-6e19-4225-8482-72a9de70cac6.png" width="700" />
 
+
+## 7. Server: LowDB, json-server
+### LowDB
+json-server를 더 사용하기 쉽게 만들어주는 라이브러리 <br/>
+lowDB를 사용하여 Rest API를 수정한 버전과 GraphQL을 수정한 버전 2가지를 작업
+
+[lowDB 도입으로 인한 변경사항]
+  * 기존의 readDB 함수 대신 db.read()로 db 데이터를 바로 읽어와서 db.data(~.messages 또는 ~.users)로 반환
+  * 기존의 writeDB 함수는 db.write()로 완전히 대체
+  * messages.json과 user.json을 하나로 합쳐서 db.json 파일 하나에 모음
+  * dbController.js 코드가 매우 간결해짐 (readDB와 writeDB 사라지고, lowdb의 JSONFileSync와 LowSync 모듈로 간단히 db 생성)
+  * server/index.js에서 ApolloServer 객체(server 변수)의 context에 들어가는 키를 'db' 대신 'models'로 교체 -- 상단에서 import한 'db' 때문에 resolvers에서 헷갈릴 수 있어서<br/>
+    => context를 사용했던 다른 파일들에도 변경사항 모두 반영
+
+### json-server
+
+  
