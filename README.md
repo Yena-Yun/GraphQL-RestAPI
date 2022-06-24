@@ -2,13 +2,18 @@
 인프런 풀스택 리액트 토이프로젝트 강의 (Next.js, GraphQL/RestAPI)
 
 # 🧚‍♀️ 사용 스택
-* Javascript / React
+### 가장 기본적이고 핵심적인 기술
+* Javascript
+* REST API or GraphQL (데이터 통신 관련)
 
-* REST API or GraphQL
+### 백엔드 진영(+ 많이 쓰이는 것)
+* Node.js / express
 
-* Node.js / express / Apollo-server / react-query
-* Next.js
 
+### 그외의 프레임워크 / 라이브러리
+미래에 다른 것으로 대체될 가능성 있음
+* Next.js / React
+* apollo-server / react-query
 * LowDB / json-server
 
 # 🍰 배운 내용 정리
